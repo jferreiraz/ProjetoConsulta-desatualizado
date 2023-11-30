@@ -1,7 +1,8 @@
+// Pesquisa.js
 import React, { useState } from 'react';
-import dados from '../dados/dados.json';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import '../estilo/Pesquisa.css';
-import { useNavigate } from 'react-router-dom'; 
 
 function Pesquisa() {
     const [termoPesquisa, setTermoPesquisa] = useState('');
@@ -9,28 +10,33 @@ function Pesquisa() {
     const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
     const [paginaAtual, setPaginaAtual] = useState(1);
     const [termoPesquisadoAnterior, setTermoPesquisadoAnterior] = useState('');
-    const resultadosPorPagina = 2;
-    const navigate = useNavigate(); 
+    const resultadosPorPagina = 10; // Alterado para 5 empresas por página
+    const navigate = useNavigate();
 
-    const handlePesquisar = () => {
-        const resultados = dados.filter((empresa) => {
-            if (tipoPesquisa === 'cnpj') {
-                return empresa.message.cnpj_basico.includes(termoPesquisa);
-            } else {
-                return empresa.message.nome_fantasia.includes(termoPesquisa);
-            }
-        });
+    const handlePesquisar = async () => {
+        let apiUrl;
+        if (tipoPesquisa === 'cnpj') {
+            apiUrl = `/api/v1/estabelecimentos/cnpj/${termoPesquisa}`;
+        } else {
+            apiUrl = `/api/v1/estabelecimentos/nome/${termoPesquisa}`;
+        }
 
-        setResultadosPesquisa(resultados);
-        setTermoPesquisadoAnterior(termoPesquisa);
-        setTermoPesquisa('');
-        setPaginaAtual(1);
-    };
+        console.log('API URL:', apiUrl);
 
-    const obterResultadosPaginaAtual = () => {
-        const indiceInicial = (paginaAtual - 1) * resultadosPorPagina;
-        const indiceFinal = indiceInicial + resultadosPorPagina;
-        return resultadosPesquisa.slice(indiceInicial, indiceFinal);
+        try {
+            const response = await axios.get(apiUrl);
+            const data = response.data;
+
+            console.log('API Response:', data);
+
+            setResultadosPesquisa(data.message);
+            setTermoPesquisadoAnterior(termoPesquisa);
+            setTermoPesquisa('');
+            setPaginaAtual(1); // Reinicia para a primeira página ao realizar uma nova pesquisa
+        } catch (error) {
+            console.error('Erro ao obter dados da API:', error);
+            // Adicione tratamento de erro mais genérico aqui
+        }
     };
 
     const toggleTipoPesquisa = () => {
@@ -39,7 +45,13 @@ function Pesquisa() {
 
     const abrirDetalhesEmpresa = (cnpj) => {
         navigate(`/detalhes/${cnpj}`);
-      };
+    };
+
+    const obterResultadosPaginaAtual = () => {
+        const indiceInicial = (paginaAtual - 1) * resultadosPorPagina;
+        const indiceFinal = indiceInicial + resultadosPorPagina;
+        return resultadosPesquisa.slice(indiceInicial, indiceFinal);
+    };
 
     return (
         <div className="pesquisa-container">
@@ -55,7 +67,7 @@ function Pesquisa() {
                 />
             </div>
             <div className="button-group">
-            <div className="switch-container">
+                <div className="switch-container">
                     <label>Alternar Pesquisa:</label>
                     <div className="switch">
                         <input
@@ -73,22 +85,23 @@ function Pesquisa() {
             {obterResultadosPaginaAtual().length > 0 && (
                 <div>
                     <h3>Resultados da Pesquisa</h3>
-                <p>
-                    Pesquisando por: {tipoPesquisa === 'cnpj' ? <strong>CNPJ</strong> : <strong>Nome da Empresa</strong>}  {termoPesquisadoAnterior}
-                </p>
-                <ul>
-                    {obterResultadosPaginaAtual().map((empresa, index) => (
-                        <li key={index} className="resultado-item">
-                            <div>
-                                <p><strong>CNPJ:</strong> {empresa.message.cnpj_basico}</p>
-                                <p><strong>Nome:</strong> {empresa.message.nome_fantasia}</p>
-                            </div>
-                            <button onClick={() => abrirDetalhesEmpresa(empresa.message.cnpj_basico)}>
-                                <strong>Ver Detalhes</strong>
-                            </button>
-                        </li>
-                    ))}
-                </ul>
+                    {/*<p>
+                        Pesquisando por: {tipoPesquisa === 'cnpj' ? <strong>CNPJ</strong> : <strong>Nome da Empresa</strong>}  {termoPesquisadoAnterior}
+                    </p>*/}
+                    <ul>
+                        {obterResultadosPaginaAtual().map((empresa, index) => (
+                            <li key={index} className="resultado-item">
+                                <div>
+                                    <p><strong>CNPJ:</strong> {empresa.cnpj}</p>
+                                    <p><strong>Nome:</strong> {empresa.nome_fantasia}</p>
+                                    {/* Adicione outras informações conforme necessário */}
+                                </div>
+                                <button onClick={() => abrirDetalhesEmpresa(empresa.cnpj)}>
+                                    <strong>Ver Detalhes</strong>
+                                </button>
+                            </li>
+                        ))}
+                    </ul>
 
                     <div className="pagination">
                         <button
