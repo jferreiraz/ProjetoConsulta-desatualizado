@@ -1,9 +1,11 @@
 // src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Pesquisa from './components/pages/Pesquisa';
-import DetalhesEmpresa from './components/pages/DetalhesEmpresa';
-
+import Search from './pages/Search';
+import Details from './pages/Details';
+import Mapa from './pages/Map';
+import SearchV2 from './pages/SearchV2';
+import About from './pages/About';
 
 function App() {
   return (
@@ -20,8 +22,11 @@ function App() {
         </nav> */}
 
         <Routes>
-          <Route path="/" element={<Pesquisa />} />
-          <Route path="/detalhes/:cnpj" element={<DetalhesEmpresa />} />
+          <Route path="/" element={<Search />} />
+          <Route path="/detalhes/:cnpj" element={<Details />} />
+          <Route path="/mapa" element={<Mapa />} />
+          <Route path="/pesquisaV2" element={<SearchV2 />} />
+          <Route path="/sobre" element={<About />} />
         </Routes>
       </div>
     </Router>

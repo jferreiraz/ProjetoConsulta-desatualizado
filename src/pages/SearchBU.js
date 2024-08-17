@@ -1,15 +1,18 @@
-// Pesquisa.js
+// Search.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '../estilo/Pesquisa.css';
 
-function Pesquisa() {
+import '../style/Search.css';
+import HeaderPage from '../components/Header.js';
+import SearchBar from '../components/SearchBar.js';
+
+function Search() {
     const [termoPesquisa, setTermoPesquisa] = useState('');
     const [tipoPesquisa, setTipoPesquisa] = useState('cnpj');
     const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
     const [paginaAtual, setPaginaAtual] = useState(1);
-    const [termoPesquisadoAnterior, setTermoPesquisadoAnterior] = useState('');
+    const [/*termoPesquisadoAnterior*/, setTermoPesquisadoAnterior] = useState('');
     const resultadosPorPagina = 10; // Alterado para 5 empresas por página
     const navigate = useNavigate();
 
@@ -54,8 +57,10 @@ function Pesquisa() {
     };
 
     return (
+        <div>
+            <HeaderPage />
         <div className="pesquisa-container">
-            <h2>Pesquisa</h2>
+            <p className='frase'>Consulte abaixo empresas situadas no Brasil por meio do nome ou CNPJ!</p>
             <div className="form-group">
                 <label>
                     {tipoPesquisa === 'cnpj' ? 'CNPJ:' : 'Nome da Empresa:'}
@@ -125,7 +130,8 @@ function Pesquisa() {
                 <p>Nenhuma empresa encontrada.</p>
             )}
         </div>
+        </div>
     );
 }
 
-export default Pesquisa;
+export default Search;

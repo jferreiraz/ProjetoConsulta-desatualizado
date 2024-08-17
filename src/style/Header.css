@@ -1,0 +1,47 @@
+body{
+  overflow-x: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #333;
+  color: white;
+  width: 100vw; /* Ocupa toda a largura da tela */
+
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 80px;
+  margin-right: 10px;
+}
+
+span {
+  font-weight: bold;
+  font-size: 20px;
+  text-decoration: none;
+  color: white;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  margin-left: 20px;
+  margin-right: 80px;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}

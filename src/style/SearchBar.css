@@ -1,0 +1,34 @@
+.search-bar {
+
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
+    
+  }
+  
+.searchbar-button{
+  position: relative;
+}
+
+  .buttons {
+    justify-content: left;
+  }
+  
+  .buttons button {
+    margin-right: 10px;
+    padding: 10px 15px;
+    background-color: #e9e9e9;
+    cursor: pointer;
+    border: 0;
+    color:#b4b4b4;
+    border-top-left-radius: 1dvb;
+    border-top-right-radius: 1dvb;
+    font-weight: 700;
+    font-size: 15px;
+  }
+  
+  .buttons button.active {
+    background-color: blue; /* Cor de destaque para o botão ativo */
+    color: white;
+  }
+  
