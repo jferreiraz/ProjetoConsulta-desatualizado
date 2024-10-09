@@ -5,12 +5,10 @@ import '../style/Details.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAnchorCircleCheck, faArrowAltCircleDown, faArrowAltCircleRight, faChevronDown, faChevronLeft, faChevronRight, faChevronUp, faCoffee, faLongArrowLeft, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 
-
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 import HeaderPage from '../components/Header.js';
-
 
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -179,12 +177,7 @@ function Details() {
                         </div>
 
 
-
-
-
                     </div>
-
-
 
                     {selectedFilial && (
                         <div className='modal-geral'>
