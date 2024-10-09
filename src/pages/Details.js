@@ -27,6 +27,15 @@ const formatFieldName = (fieldName) => {
     return fieldName.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+const formatCase = (str) => {
+    if (typeof str !== 'string') return str; // Certifica-se de que o valor é uma string
+    return str
+      .split(' ') // Divide a string em um array de palavras
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitaliza a primeira letra de cada palavra
+      .join(' '); // Junta as palavras novamente em uma string
+  };
+  
+
 function Details() {
     const { cnpj } = useParams();
     const [detalhesEmpresa, setDetalhesEmpresa] = useState(null);
@@ -128,7 +137,7 @@ function Details() {
                                 {camposEmpresa.map(([campo, valor]) => (
                                     <tr key={campo}>
                                         <td><strong>{formatFieldName(campo)}</strong></td>
-                                        <td>{typeof valor === 'object' ? JSON.stringify(valor) : valor}</td>
+                                        <td>{typeof valor === 'object' ? JSON.stringify(valor) : formatCase(valor)}</td>
                                     </tr>
                                 ))}
                                 <tr><td><strong>Filiais</strong></td>

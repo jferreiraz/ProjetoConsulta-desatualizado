@@ -30,3 +30,12 @@ Details.js antes:                 const response = await axios.get(`/api/?cnpj=$
 1. Alterar a página de detalhes para um modal na página principal
 2. Ajustar mapa de acordo com a localização
 3. Verificar velocidade de carregamento docker
+
+
+### Atualizar no github
+
+1. git status (verificar alterações)
+2. git add .
+3. git commit -m "Descrição commit"
+4. git push origin master
+
