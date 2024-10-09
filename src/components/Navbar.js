@@ -31,6 +31,8 @@ function Navbar() {
   const addFilter = (type, value) => {
     if (value.trim() === '') return;
 
+    //if (/\d/.value) 
+
     const newFilters = filters.filter((f) => f.type !== type);
     setFilters([...newFilters, { type, value }]);
   };
@@ -41,18 +43,21 @@ function Navbar() {
 
   const fetchData = async (page = 0) => {
     const queryString = filters.map((filter) => `${filter.type.toLowerCase()}=${filter.value}`).join('&');
-    const url = `/api/?${queryString}&pagina=${page}`;
+    //url abaixo não esta sendo utilizado na atual linha 48 = (deveria ser utilizado em 'const response = await fetch(url);')
+    const url = `http://localhost:8000/api/v1/empresas/?${queryString}&pagina=${page}&tamanho=200`;
 
     try {
       const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`); // Lança um erro se a resposta não for ok
+      }
       const data = await response.json();
 
       if (data.message && data.message.resposta) {
         const apiData = data.message.resposta;
-        console.log('Dados da API:', apiData);
-
+        console.log('Dados da API:', apiData); 
         setApiData(apiData);
-        setCurrentPage(page); // Atualiza a página atual
+        setCurrentPage(page);
       } else {
         throw new Error('A resposta da API não contém os dados esperados');
       }
@@ -60,6 +65,7 @@ function Navbar() {
       console.error('Erro ao buscar dados da API:', error);
     }
   };
+
 
   const indexOfLastItem = (currentPage + 1) * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -74,8 +80,22 @@ function Navbar() {
 
           <div className='filtroPesquisa'>
             <span className='tituloFiltros'>Filtros</span>
-            <div className="iconeLupa"><input type="text" placeholder="Busca por nome ou CNPJ..." className='InputFiltros' />
-            <FontAwesomeIcon className='lupa' icon={faSearch} onClick={() => fetchData()} /></div>
+            
+            <div className="iconeLupa">
+              
+              <input type="text" placeholder="Busca por nome ou CNPJ..." className='InputFiltros' />
+
+              <FontAwesomeIcon className='lupa' icon={faSearch} onClick={() => fetchData()} /></div>
+
+              <div className="filters-container">
+              {filters.map((filter, index) => (
+                <div key={index} className="filter">
+                  <span>{filter.type}: {filter.value} </span>
+                  <FontAwesomeIcon icon={faTimes} onClick={() => removeFilter(filter)} />
+                </div>
+              ))}
+            </div>
+          
           </div>
 
 
@@ -87,8 +107,8 @@ function Navbar() {
             </div>
             {showName && (
               <div className="input-container">
-                <input type="text" placeholder="Busca por nome..." onBlur={(e) => addFilter('nome_empresa', e.target.value)} />
-                <button onClick={() => addFilter('nome_empresa', '')}>Adicionar</button>
+                <input type="text" placeholder="Busca por nome..." onBlur={(e) => addFilter('nome', e.target.value)} />
+                <button onClick={() => addFilter('nome', '')}>Adicionar</button>
               </div>
             )}
 
@@ -154,15 +174,8 @@ function Navbar() {
 
             {/* <span className='tituloFiltros'>Filtros aplicados</span> */}
 
-            
-            <div className="filters-container">
-              {filters.map((filter, index) => (
-                <div key={index} className="filter">
-                  <span>{filter.type}: {filter.value} </span>
-                  <FontAwesomeIcon icon={faTimes} onClick={() => removeFilter(filter)} />
-                </div>
-              ))}
-            </div>
+
+          
 
 
           </div>
@@ -170,19 +183,11 @@ function Navbar() {
 
 
 
-
-
-
-
-
         </nav>
       </div>
-
-
       <div className='fullpage'>
 
-        
-  {/* <h2>Resultados da Pesquisa</h2>
+        {/* <h2>Resultados da Pesquisa</h2>
   <div>
     <button onClick={() => fetchData(currentPage - 1)} disabled={currentPage === 0}>Página Anterior</button>
     <button onClick={() => fetchData(currentPage + 1)} disabled={currentPage + 1 >= totalPages}>Próxima Página</button>
@@ -191,44 +196,35 @@ function Navbar() {
     Página {currentPage + 1} de {totalPages}
   </div> */}
 
-
-<table>
-  <thead>
-    <tr>
-      <th>Razão Social/Nome Empresarial</th>
-      <th>Total de Filiais</th>
-      <th>CNPJ Base</th>
-      <th>Natureza Jurídica</th>
-      <th>Mais</th>
-    </tr>
-  </thead>
-  <tbody>
-    {currentItems.map((empresa, index) => (
-      <tr key={index}>
-        <td>{empresa.razao_social_nome_empresarial}</td>
-        <td>{empresa.filial.length}</td>
-        <td>{empresa.cnpj_base}</td>
-        <td>{empresa.natureza_juridica}</td>
-        <td>                
-                <Link to={`/detalhes/${empresa.cnpj_base}`}>
-                    
-                <FontAwesomeIcon icon={faArrowAltCircleRight} style={{ paddingLeft: '10px',  color: 'blue', cursor: 'pointer' }}/></Link></td>
-      </tr>
-    ))}
-  </tbody>
-</table>
-
-
-
-</div>
-
-
-
-
-
-
+        <table>
+          <thead>
+            <tr>
+              <th>Razão Social/Nome Empresarial</th>
+              <th>Matriz/Filial</th>
+              <th>CNPJ Base</th>
+              <th>Natureza Jurídica</th>
+              <th>Mais</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentItems.map((empresa, index) => (
+              <tr key={index}>
+                <td>{empresa.razao_social_nome_empresarial}</td>
+                {/* <td>{empresa.filial.length}</td> */}
+                <td>{empresa.identificador_matriz_filial === '1' ? 'Matriz' :
+                  empresa.identificador_matriz_filial === '2' ? 'Filial' :
+                    'Desconhecido'}</td>
+                <td>{empresa.cnpj_base}</td>
+                <td>{empresa.natureza_juridica}</td>
+                <td>
+                  <Link to={`/detalhes/${empresa.cnpj_base}`}>
+                    <FontAwesomeIcon icon={faArrowAltCircleRight} style={{ paddingLeft: '10px', color: 'blue', cursor: 'pointer' }} /></Link></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-
   );
 
 

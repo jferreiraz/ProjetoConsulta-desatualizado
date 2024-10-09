@@ -42,7 +42,7 @@ function Details() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get(`/api/?cnpj=${cnpj}`);
+                const response = await axios.get(`http://localhost:8000/api/v1/empresas/?cnpj=${cnpj}`);
                 console.log('Resposta da API:', response);
 
                 const data = response.data;

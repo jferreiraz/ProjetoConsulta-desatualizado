@@ -16,18 +16,17 @@ body {
   }
 
   .page {
-    display: flex;
+    display:flex;
   }
   
   .navbar {
     background-color: #d6d6d6;
-    height: 845px;
-    display: flex;
+    height: 100%;
+
     flex-direction: column;
     justify-content: flex;
     align-items: flex-start;
-    width: 430px;
-    margin-right: 50px;
+    margin-right: 10vmin;
   }
 
   .tituloFiltros {
@@ -47,12 +46,13 @@ body {
     align-items: top;
     justify-content: space-between;
     background-color: rgb(207, 207, 207);
-    width: 95%;
+    width: 85%;
   }
   
 
   .filters-container {
     margin-top: 15px;
+
   }
 
   button {
@@ -75,7 +75,7 @@ body {
   input {
     border-radius: 4px;
     margin-top: 10px;
-    width: 200px;
+    width: 70%;
     height: 30px;
     font-size: 14px;
     padding-left: 5px;
@@ -117,7 +117,7 @@ input::placeholder {
 
 .InputFiltros{
   padding-left: 1px;
-  width: 350px;
+  width: 75%;
   height: 30px;
   border: none;
   margin-bottom: 5px;
@@ -129,6 +129,7 @@ input::placeholder {
 
 .iconeLupa{
   padding-left: 8px;
+  padding-right: 8px;
   border: 1px solid rgb(114, 114, 114);
   border-radius: 5px;
 }
@@ -136,8 +137,8 @@ input::placeholder {
 .fullpage{
   border: 1px solid rgb(189, 189, 189);
   border-radius: 3px;
-  width: 1300px;
-  height: 760px;
+  width: 70%;
+  height: 100%;
   margin: 30px;
 
   box-sizing: border-box;
@@ -145,7 +146,6 @@ input::placeholder {
   flex-direction: column;
   align-items: center;
 
-  overflow: auto;
 }
 
 
