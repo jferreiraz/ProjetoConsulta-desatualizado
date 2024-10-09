@@ -19,8 +19,11 @@ function Navbar() {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 50;
 
+  var queryFilterPage = "";
+  var queryFilterSize = "";
+
   const formatCase = (str) => {
-    if (typeof str !== 'string') 
+    if (typeof str !== 'string')
       return str;
     return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
   };
@@ -53,11 +56,24 @@ function Navbar() {
     //console.log({type:"nome",value:"nome"});
   };
 
-
-  const fetchData = async (page = 0) => {
+  const fetchData = async (tamanho, pagina) => { // page 0
     const queryString = filters.map((filter) => `${filter.type.toLowerCase()}=${filter.value}`).join('&');
     //url abaixo não esta sendo utilizado na atual linha 48 = (deveria ser utilizado em 'const response = await fetch(url);')
-    const url = `http://localhost:8000/api/v1/empresas/?${queryString}&pagina=${page}&tamanho=200`;
+
+    if(tamanho == null && pagina == null){
+    } if(tamanho == null && pagina != null){
+      var queryFilterPage = "pagina="+pagina;
+      var queryFilterSize = "";
+    } if(pagina == null && tamanho != null){
+      var queryFilterPage = "";
+      var queryFilterSize = "tamanho="+tamanho;
+    } if(pagina != null && tamanho != null){
+      var queryFilterPage = "tamanho="+tamanho;
+      var queryFilterSize = "&pagina="+pagina;
+    };
+
+
+    const url = `http://localhost:8000/api/v1/empresas/?${queryString}&${queryFilterPage}${queryFilterSize}`;
 
     try {
       const response = await fetch(url);
@@ -70,7 +86,7 @@ function Navbar() {
         const apiData = data.message.resposta;
         console.log('Dados da API:', url, apiData);
         setApiData(apiData);
-        setCurrentPage(page);
+        //setCurrentPage(page);
       } else {
         throw new Error('A resposta da API não contém os dados esperados');
       }
@@ -89,8 +105,6 @@ function Navbar() {
     <div className='page'>
       <div>
         <nav className="navbar">
-
-
           <div className='filtroPesquisa'>
             <span className='tituloFiltros'>Filtros</span>
 
@@ -101,31 +115,19 @@ function Navbar() {
                 placeholder="Busca por nome ou CNPJ..."
                 onChange={(e) => {
                   const value = e.target.value;
-
-
-                  // Verifica se o valor contém apenas números
                   const isNumber = /^[0-9]+$/.test(value);
 
                   if (isNumber) {
-                    // Se o valor for apenas números, adiciona o filtro CNPJ
                     addFilter('CNPJ', value);
-                    //removeFilter({type:"nome",value:value}); // Remove o filtro de nome, se necessário
-                    //console.log('t1', isNumber);
                   } else {
-                    // Se o valor contém letras, adiciona o filtro nome
                     addFilter('nome', value);
-                    //removeFilter({type:"CNPJ",value:value}); // Remove o filtro de CNPJ, se necessário
-                    //console.log('t2', isNumber);
                   }
-
                 }}
 
                 onKeyUp={(e) => {
                   const value = e.target.value;
 
                   if (value === '') {
-                    // Se o campo estiver vazio, remove ambos os filtros
-                    console.log('entrou value1==""');
                     if (filters.find(filter => filter.type === 'nome') !== '') {
                       removeFilter(filters.find(filter => filter.type === 'nome'));
                     }
@@ -135,21 +137,11 @@ function Navbar() {
                 onKeyDown={(e) => {
                   const value = e.target.value;
 
-
-                  // Se o campo estiver vazio, remove ambos os filtros
-                  console.log('entrou value2==""');
                   if (filters.find(filter => filter.type === 'cnpj') !== '') {
-                    console.log('entrou value3tt==""');
                     removeFilter(filters.find(filter => filter.type === 'CNPJ'));
-                    console.log('entrou value4tt==""');
-
                   }
-
                 }}
-
               />
-
-
 
               <FontAwesomeIcon className='lupa' icon={faSearch} onClick={() => fetchData()} /></div>
 
@@ -166,8 +158,6 @@ function Navbar() {
 
 
           <div className='campos'>
-
-
 
             <div className="toggle-input" onClick={() => toggleInput('location')}>
               <span>Localização </span>
@@ -243,26 +233,17 @@ function Navbar() {
             )}
 
 
-
-
-
-
             {/* <span className='tituloFiltros'>Filtros aplicados</span> */}
 
-
-
-
-
           </div>
-
-
 
 
         </nav>
       </div>
       <div className='fullpage'>
 
-        {/* <h2>Resultados da Pesquisa</h2>
+{/*
+         <h2>Resultados da Pesquisa</h2>
   <div>
     <button onClick={() => fetchData(currentPage - 1)} disabled={currentPage === 0}>Página Anterior</button>
     <button onClick={() => fetchData(currentPage + 1)} disabled={currentPage + 1 >= totalPages}>Próxima Página</button>
@@ -271,7 +252,20 @@ function Navbar() {
     Página {currentPage + 1} de {totalPages}
   </div> */}
 
+
         <table>
+          <thead>
+            <tr>
+              Modo de pesquisa
+              <a onClick={(e) => fetchData("25", null)} > 25</a> 
+              <a onClick={(e) => fetchData("50", null)} > 50</a> 
+              <a onClick={(e) => fetchData("100", null)} > 100</a>
+
+              <a onClick={(e) => fetchData(null,"0")} > 1</a> 
+              <a onClick={(e) => fetchData(null,"1")} > 2</a> 
+              <a onClick={(e) => fetchData(null,"2")} > 3</a>
+            </tr>
+          </thead>
           <thead>
             <tr>
               <th>Razão Social/Nome Empresarial</th>
