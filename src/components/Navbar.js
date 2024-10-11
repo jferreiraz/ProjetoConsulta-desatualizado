@@ -4,37 +4,125 @@ import { faArrowAltCircleRight, faChevronDown, faChevronUp, faSearch, faTimes } 
 import '../style/Navbar.css';
 import { Link } from 'react-router-dom';
 
-import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
-
 
 //https://mui.com/material-ui/api/menu/
 
+import PropTypes from 'prop-types';
+import { useTheme } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
+import TableFooter from '@mui/material/TableFooter';
+import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import TableHead from '@mui/material/TableHead';
 import Paper from '@mui/material/Paper';
 
+import IconButton from '@mui/material/IconButton';
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
+import FirstPageIcon from '@mui/icons-material/FirstPage';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
+import LastPageIcon from '@mui/icons-material/LastPage';
+
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
+
+const bull = (
+  <Box
+    component="span"
+    sx={{ display: 'inline-block', mx: '2px', transform: 'scale(0.8)' }}
+  >
+    •
+  </Box>
+);
+
+function TablePaginationActions(props) {
+  const theme = useTheme();
+  const { count, page, rowsPerPage, onPageChange } = props;
+
+  const handleFirstPageButtonClick = (event) => {
+    onPageChange(event, 0);
+  };
+
+  const handleBackButtonClick = (event) => {
+    onPageChange(event, page - 1);
+  };
+
+  const handleNextButtonClick = (event) => {
+    onPageChange(event, page + 1);
+  };
+
+  const handleLastPageButtonClick = (event) => {
+    onPageChange(event, Math.max(0, Math.ceil(count / rowsPerPage) - 1));
+  };
+
+  return (
+    <Box sx={{ flexShrink: 0, ml: 2.5 }}>
+      <IconButton
+        onClick={handleFirstPageButtonClick}
+        disabled={page === 0}
+        aria-label="first page"
+      >
+        {theme.direction === 'rtl' ? <FirstPageIcon /> : <FirstPageIcon />}
+      </IconButton>
+      <IconButton
+        onClick={handleBackButtonClick}
+        disabled={page === 0}
+        aria-label="previous page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowLeft />}
+      </IconButton>
+      <IconButton
+        onClick={handleNextButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="next page"
+      >
+        {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowRight />}
+      </IconButton>
+      <IconButton
+        onClick={handleLastPageButtonClick}
+        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+        aria-label="last page"
+      >
+        {theme.direction === 'rtl' ? <LastPageIcon /> : <LastPageIcon />}
+      </IconButton>
+    </Box>
+  );
 }
 
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+TablePaginationActions.propTypes = {
+  count: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
+  page: PropTypes.number.isRequired,
+  rowsPerPage: PropTypes.number.isRequired,
+};
 
 
 function Navbar() {
+  const [apiData, setApiData] = useState([]);
+  const rows = apiData;
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
- 
+  // Avoid a layout jump when reaching the last page with empty rows.
+  const emptyRows =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const [showLocation, setShowLocation] = useState(false);
   const [showOpeningDate, setShowOpeningDate] = useState(false);
@@ -43,7 +131,6 @@ function Navbar() {
   const [showPorte, setShowPorte] = useState(false);
 
   const [filters, setFilters] = useState([]);
-  const [apiData, setApiData] = useState([]);
   const [tamanho, setTamanho] = useState(null);
   const [pagina, setPagina] = useState(null);
 
@@ -101,6 +188,7 @@ function Navbar() {
     }
   };
 
+
   const handleSizeChange = (size) => {
     console.log(`Tamanho página selecionada: ${size}`);
     setTamanho(size);
@@ -114,8 +202,6 @@ function Navbar() {
   };
 
 
-
-
   return (
 
     <div className='page'>
@@ -125,7 +211,6 @@ function Navbar() {
             <span className='tituloFiltros'>Filtros</span>
 
             <div className="iconeLupa">
-              <Button variant="contained">Hello world</Button>;
               <input
                 type="text"
                 placeholder="Busca por nome ou CNPJ..."
@@ -159,6 +244,7 @@ function Navbar() {
 
               <FontAwesomeIcon className='lupa' icon={faSearch} onClick={() => fetchData()} /></div>
 
+            {/*
             <div className="filters-container">
               {filters.map((filter, index) => (
                 <div key={index} className="filter">
@@ -167,6 +253,17 @@ function Navbar() {
                 </div>
               ))}
             </div>
+            */}
+
+            {filters.map((filter, index) => (
+            <Paper elevation={2}  key={index}>
+              <CardActions style={{justifyContent: 'space-between', margin:5}}>
+                {filter.type}: {filter.value} 
+                <Button  onClick={() => removeFilter(filter)} size="small">Apagar Filtro</Button>
+              </CardActions>
+            </Paper>
+            ))}
+
 
           </div>
 
@@ -179,7 +276,7 @@ function Navbar() {
             </div>
             {showLocation && (
               <div className="input-container">
-                <select name="UF" onChange={(e) => addFilter('UF', e.target.value)} id="UF"><option value="" disabled selected>Selecione UF</option><option value="DF">DF</option><option value="SP">SP</option><option value="MG">MG</option><option value="RJ">RJ</option></select>
+                <select name="UF" onClick={() => fetchData()} onChange={(e) => addFilter('UF', e.target.value)} id="UF"><option value="" disabled selected>Selecione UF</option><option value="DF">DF</option><option value="SP">SP</option><option value="MG">MG</option><option value="RJ">RJ</option></select>
 
                 {/*
                 <input type="text" placeholder="Digite a UF..." onChange={(e) => addFilter('UF', e.target.value)} />
@@ -198,8 +295,8 @@ function Navbar() {
             </div>
             {showOpeningDate && (
               <div className="input-container">
-                <input type="date" placeholder="Início de atividade..." onChange={(e) => addFilter('Abertura_de', e.target.value)} />
-                <input type="date" placeholder="Fim de atividade..." onChange={(e) => addFilter('Abertura_ate', e.target.value)} />
+                <input type="date" placeholder="Início de atividade..." onClick={() => fetchData()} onChange={(e) => addFilter('Abertura_de', e.target.value)} />
+                <input type="date" placeholder="Fim de atividade..." onClick={() => fetchData()} onChange={(e) => addFilter('Abertura_ate', e.target.value)} />
 
               </div>
             )}
@@ -210,7 +307,7 @@ function Navbar() {
             </div>
             {showBranch && (
               <div className="input-container">
-                <select name="Matriz/Filial" onChange={(e) => addFilter('Matriz', e.target.value)} id="Matriz">
+                <select name="Matriz/Filial" onClick={() => fetchData()} onChange={(e) => addFilter('Matriz', e.target.value)} id="Matriz">
                   <option value="" disabled selected>Selecione</option>
                   <option value="1">Matriz</option>
                   <option value="2">Filial</option>
@@ -247,15 +344,13 @@ function Navbar() {
             )}
 
 
-
           </div>
-
 
         </nav>
       </div>
       <div className='fullpage'>
 
-
+        {/*
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -268,36 +363,105 @@ function Navbar() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {apiData.map((empresa) => (
                 <TableRow
-                  key={row.name}
+                  key={empresa.razao_social_nome_empresarial}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {row.name}
+                    {empresa.razao_social_nome_empresarial}
                   </TableCell>
-                  <TableCell align="right">{row.calories}</TableCell>
-                  <TableCell align="right">{row.fat}</TableCell>
-                  <TableCell align="right">{row.carbs}</TableCell>
-                  <TableCell align="right">{row.protein}</TableCell>
+                  <TableCell align="right">{empresa.razao_social_nome_empresarial}</TableCell>
+                  <TableCell align="right">{empresa.cnpj_base}</TableCell>
+                  <TableCell align="right">{empresa.razao_social_nome_empresarial}</TableCell>
+                  <TableCell align="right">{empresa.razao_social_nome_empresarial}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        */}
 
+
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 100 }} aria-label="custom pagination table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Razão Social/Nome Empresarial</TableCell>
+                <TableCell align="right">Matriz/Filial</TableCell>
+                <TableCell align="right">CNPJ</TableCell>
+                <TableCell align="right">Natureza Jurídica</TableCell>
+                <TableCell align="right">Mais</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(rowsPerPage > 0
+                ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                : rows
+              ).map((empresa) => (
+                <TableRow key={empresa.razao_social_nome_empresarial}>
+                  <TableCell>
+                    {empresa.razao_social_nome_empresarial}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="right">
+                    {empresa.identificador_matriz_filial === '1' ? 'Matriz' :
+                      empresa.identificador_matriz_filial === '2' ? 'Filial' :
+                        'Desconhecido'}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="right">
+                    {empresa.cnpj_base}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="right">
+                    {empresa.natureza_juridica}
+                  </TableCell>
+                  <TableCell style={{ width: 10 }} align="right">
+                    <Link to={`/detalhes/${empresa.cnpj_base}`}>
+                      <FontAwesomeIcon icon={faArrowAltCircleRight} style={{ paddingLeft: '10px', color: 'blue', cursor: 'pointer' }} /></Link>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {emptyRows > 0 && (
+                <TableRow style={{ height: 13 * emptyRows }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 50, { label: 'Todos', value: -1 }]}
+                  colSpan={5}
+                  count={rows.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  slotProps={{
+                    select: {
+                      inputProps: {
+                        'aria-label': 'Quantidade de itens',
+                      },
+                      native: true,
+                    },
+                  }}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
+              </TableRow>
+            </TableFooter>
+          </Table>
+        </TableContainer>
+
+
+        {/*
         <table>
 
           <thead>
             <tr>
 
 
-
-
-
-
               <Pagination onChange={(event, page) => handlePageChange(page)} count={10} color="primary" />
               <Pagination onChange={(event, size) => handleSizeChange(size)} count={10} color="primary" />
+              
 
             </tr>
           </thead>
@@ -314,7 +478,7 @@ function Navbar() {
             {apiData.map((empresa, index) => (
               <tr key={index}>
                 <td>{formatCase(empresa.razao_social_nome_empresarial)}</td>
-                {/* <td>{empresa.filial.length}</td> */}
+                 <td>{empresa.filial.length}</td> 
                 <td>{empresa.identificador_matriz_filial === '1' ? 'Matriz' :
                   empresa.identificador_matriz_filial === '2' ? 'Filial' :
                     'Desconhecido'}</td>
@@ -327,6 +491,10 @@ function Navbar() {
             ))}
           </tbody>
         </table>
+
+        */}
+
+
       </div>
     </div>
   );
